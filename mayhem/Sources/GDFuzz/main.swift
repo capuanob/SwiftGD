@@ -45,10 +45,21 @@ public func GDFuzz(_ start: UnsafeRawPointer, _ count: Int) -> CInt {
 
     do {
         let imp_format = fdp.PickValueInList(from: import_formats)
-        let img = try Image(data: fdp.ConsumeRandomLengthData(), as: imp_format)
+        guard var img = try? Image(data: fdp.ConsumeRandomLengthData(), as: imp_format) else {
+            return -1
+        }
 
         if fdp.ConsumeBoolean() {
             img.fill(from: .zero, color: fdp.PickValueInList(from: fill_colors))
+        } else {
+            let w: UInt = fdp.ConsumeIntegral()
+            let h: UInt = fdp.ConsumeIntegral()
+            let max_int = UInt(Int.max)
+
+            if w <= max_int && h <= max_int {
+                img = try img.resizedTo(
+                        width: Int(w), height: Int(h), applySmoothing: fdp.ConsumeBoolean()) ?? img
+            }
         }
 
         let exp_format = fdp.PickValueInList(from: export_formats)
@@ -60,6 +71,7 @@ public func GDFuzz(_ start: UnsafeRawPointer, _ count: Int) -> CInt {
         }
         print(error.localizedDescription)
         print(type(of: error))
+        exit(EXIT_FAILURE)
     }
     return 0;
 }
