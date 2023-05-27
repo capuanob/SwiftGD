@@ -94,6 +94,11 @@ class FuzzedDataProvider {
         return str;
     }
 
+    func ConsumeRandomLengthData() -> Data {
+        let s = ConsumeRandomLengthString()
+        return Data(s.utf8)
+    }
+
     func ConsumeRemainingData() -> Data {
         let data = data_src
         data_src.removeAll()
