@@ -1,0 +1,8 @@
+project: SwiftGD
+target: fuzz-swift-gd
+testsuite:
+    - file://mayhem/testsuite
+
+cmds:
+  - cmd: /release/GDFuzz
+    libfuzzer: true
